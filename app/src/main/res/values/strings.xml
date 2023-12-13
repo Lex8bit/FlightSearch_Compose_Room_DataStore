@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">FlightSearch_Compose_Room_DataStore</string>
+    <string name="flight_result">Flights</string>
+    <string name="search_result">Search</string>
+</resources>
