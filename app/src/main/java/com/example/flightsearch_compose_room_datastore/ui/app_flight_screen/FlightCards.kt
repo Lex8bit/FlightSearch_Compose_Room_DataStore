@@ -24,14 +24,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.flightsearch_compose_room_datastore.R
 import com.example.flightsearch_compose_room_datastore.data.AirportCard
-import com.example.flightsearch_compose_room_datastore.ui.FlightSearchUiState
+import com.example.flightsearch_compose_room_datastore.ui.FlightUiState
 import com.example.flightsearch_compose_room_datastore.ui.theme.FlightSearch_Compose_Room_DataStoreTheme
 
 @Composable
 fun FlightCard(
     airportCard : AirportCard,
     onStarClick : () -> Unit,
-    uiState : FlightSearchUiState,
+    uiState : FlightUiState,
     modifier: Modifier = Modifier
 ){
     Card(
@@ -127,7 +127,7 @@ fun FlightCardPreview() {
         FlightCard(
             airportCard = AirportCard(0,"SPb","Sait-Petersburg","MSK","Moscow"),
             onStarClick = {},
-            uiState = FlightSearchUiState()
+            uiState = FlightUiState()
             )
     }
 }

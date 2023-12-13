@@ -9,15 +9,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.flightsearch_compose_room_datastore.R
 import com.example.flightsearch_compose_room_datastore.data.AirportCard
-import com.example.flightsearch_compose_room_datastore.ui.FlightSearchUiState
+import com.example.flightsearch_compose_room_datastore.ui.FlightUiState
 import com.example.flightsearch_compose_room_datastore.ui.app_search_screen.SearchTextField
 import com.example.flightsearch_compose_room_datastore.ui.navigation.NavigationDestination
 import com.example.flightsearch_compose_room_datastore.ui.theme.FlightSearch_Compose_Room_DataStoreTheme
 
 
-object FlightResultDestination : NavigationDestination {
-    override val route = "home"
-}
 
 @Composable
 fun FlightResultScreen(
@@ -25,7 +22,7 @@ fun FlightResultScreen(
     onTextValueChange : (String)-> Unit,
     airportCardList : List<AirportCard>,
     onStarClick : () -> Unit,
-    uiState : FlightSearchUiState,
+    uiState : FlightUiState,
     modifier : Modifier = Modifier
 ){
     Column (
@@ -57,7 +54,7 @@ fun FlightResultScreenPreview() {
                 AirportCard(1,"NSB", "Novosibirsk", "VDK", "Vladivostok")
             ),
             onStarClick = {},
-            uiState = FlightSearchUiState()
+            uiState = FlightUiState()
         )
     }
 }

@@ -8,23 +8,29 @@ import com.example.flightsearch_compose_room_datastore.FlightSearchApplication
 import com.example.flightsearch_compose_room_datastore.R
 import com.example.flightsearch_compose_room_datastore.data.AirportCard
 import com.example.flightsearch_compose_room_datastore.data.FlightRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
-
-data class FlightUiState(
+data class SearchUiState(
     val searchField : String = "",
-    val favoriteRoute : Boolean = false,
-    val starIcon : Int = if (favoriteRoute) R.drawable.ic_star_selected else R.drawable.ic_star_notselected,
-    val airportCard: AirportCard = AirportCard()
-
 )
 
-class FlightViewModel(private val flightRepository: FlightRepository): ViewModel() {
+class SearchViewModel(private val flightRepository: FlightRepository): ViewModel() {
 
+    private val _uiState = MutableStateFlow(SearchUiState())
+    val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
+    fun onSearchChange(search : String){
+        _uiState.update { currentState ->
+            currentState.copy(searchField = search)
+        }
+    }
     companion object {
         val Factory : ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                FlightViewModel(FlightSearchApplication().container.flightRepository)
+                SearchViewModel(FlightSearchApplication().container.flightRepository)
             }
         }
     }

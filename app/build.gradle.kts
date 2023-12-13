@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    // Room Db
+    id ("com.google.devtools.ksp") version "1.7.21-1.0.8"
 }
 
 android {
@@ -63,10 +65,14 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
-    //ROOM
-    implementation("androidx.room:room-ktx:2.5.1")
-    implementation("androidx.room:room-runtime:2.5.1")
-//    implementation("androidx.room:room-compiler:2.5.1")    // ПРОБЛЕММА !!! НЕ БИЛДИТСЯ С НИМ!
+    // Room Db
+    implementation ("androidx.room:room-runtime:2.5.0")
+    ksp ("androidx.room:room-compiler:2.5.0")
+    implementation ("androidx.room:room-ktx:2.5.0")
+//    //ROOM
+//    implementation("androidx.room:room-ktx:2.5.1")
+//    implementation("androidx.room:room-runtime:2.5.1")
+////    implementation("androidx.room:room-compiler:2.5.1")    // ПРОБЛЕММА !!! НЕ БИЛДИТСЯ С НИМ!
 
     //DATASTORE
     implementation("androidx.datastore:datastore-preferences:1.0.0")

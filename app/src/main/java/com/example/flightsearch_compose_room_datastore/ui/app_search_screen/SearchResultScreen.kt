@@ -14,12 +14,6 @@ import com.example.flightsearch_compose_room_datastore.ui.navigation.NavigationD
 import com.example.flightsearch_compose_room_datastore.ui.theme.FlightSearch_Compose_Room_DataStoreTheme
 
 
-object SearchResultDestination : NavigationDestination {
-    override val route = "searchResult"
-    override val titleRes = R.string.search_result
-    const val itemIdArg = "itemId"
-    val routeWithArgs = "$route/{$itemIdArg}"
-}
 
 @Composable
 fun SearchResultScreen(
