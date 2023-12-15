@@ -9,9 +9,7 @@ import com.example.flightsearch_compose_room_datastore.model.Favorite
 
 @Database(entities = [Airport::class, Favorite::class], version = 1, exportSchema = false)
 abstract class FlightSearchDatabase : RoomDatabase() {
-
     abstract fun flightSearchDao(): FlightSearchDao
-
     companion object {
         @Volatile
         private var Instance: FlightSearchDatabase? = null

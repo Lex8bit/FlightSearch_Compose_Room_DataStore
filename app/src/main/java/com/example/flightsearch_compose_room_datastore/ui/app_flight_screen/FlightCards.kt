@@ -1,5 +1,6 @@
 package com.example.flightsearch_compose_room_datastore.ui.app_flight_screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,14 +26,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.flightsearch_compose_room_datastore.R
 import com.example.flightsearch_compose_room_datastore.data.AirportCard
-import com.example.flightsearch_compose_room_datastore.ui.FlightUiState
 import com.example.flightsearch_compose_room_datastore.ui.theme.FlightSearch_Compose_Room_DataStoreTheme
 
 @Composable
 fun FlightCard(
-    airportCard : AirportCard,
-    onStarClick : () -> Unit,
-    uiState : FlightUiState,
+    airportCardItem : AirportCard,
+    onAirportCardItemStarClick : (AirportCard) -> Unit,
     modifier: Modifier = Modifier
 ){
     Card(
@@ -67,7 +67,7 @@ fun FlightCard(
                         )
                 ){
                     Text(
-                        text = airportCard.iataDepartureCode ,
+                        text = airportCardItem.iataDepartureCode ,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(
@@ -75,7 +75,7 @@ fun FlightCard(
                             .width(16.dp)
                     )
                     Text(
-                        text = airportCard.departureName,
+                        text = airportCardItem.departureName,
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
@@ -90,7 +90,7 @@ fun FlightCard(
                         )
                 ){
                     Text(
-                        text = airportCard.iataDestinationCode,
+                        text = airportCardItem.iataDestinationCode,
                         fontWeight = FontWeight.Bold
 
                     )
@@ -99,20 +99,29 @@ fun FlightCard(
                             .width(16.dp)
                     )
                     Text(
-                        text = airportCard.destinationName,
+                        text = airportCardItem.destinationName,
                     )
                 }
             }
             IconButton(
-                onClick = onStarClick,
+                onClick = { onAirportCardItemStarClick(airportCardItem) },
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
             ) {
                 Icon(
-                    painter = painterResource(uiState.starIcon),
-                    contentDescription = "Select as favorite"
+                    painter = painterResource(R.drawable.ic_star_selected),
+                    contentDescription = "Select as favorite",
+                    tint =  if (airportCardItem.isFavourite) Color(0xFFF1B512) else Color(0xFF656565)
                 )
+//                Icon(
+//                    painter = if (airportCardItem.isFavourite) {
+//                        painterResource(R.drawable.ic_star_selected)
+//                    } else {
+//                        painterResource(R.drawable.ic_star_notselected)
+//                    },
+//                    contentDescription = "Select as favorite",
+//                )
             }
         }
     }
@@ -125,9 +134,8 @@ fun FlightCard(
 fun FlightCardPreview() {
     FlightSearch_Compose_Room_DataStoreTheme {
         FlightCard(
-            airportCard = AirportCard(0,"SPb","Sait-Petersburg","MSK","Moscow"),
-            onStarClick = {},
-            uiState = FlightUiState()
+            airportCardItem = AirportCard(0,"SPb","Sait-Petersburg","MSK","Moscow"),
+            onAirportCardItemStarClick = {},
             )
     }
 }

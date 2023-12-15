@@ -13,37 +13,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.flightsearch_compose_room_datastore.data.AirportCard
-import com.example.flightsearch_compose_room_datastore.ui.FlightUiState
 import com.example.flightsearch_compose_room_datastore.ui.theme.FlightSearch_Compose_Room_DataStoreTheme
 
 @Composable
 fun FlightList(
+    tableName : String,
     airportCardList : List<AirportCard>,
-    onStarClick : () -> Unit,
-    uiState: FlightUiState,
+    onAirportCardItemStarClick : (AirportCard) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
     ) {
         Text(
-            text = if (uiState.searchField == "")
-                "Favorite routes"
-            else
-                "Flights from ${uiState.searchField}",
+            text = tableName,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
             modifier = Modifier.padding(vertical = 16.dp)
         )
         LazyColumn(
-            contentPadding = PaddingValues(4.dp)
+            contentPadding = PaddingValues(0.dp)
         ){
-            items(airportCardList){ airportCard ->
+            items(airportCardList){ airportCardItem ->
                 FlightCard(
-                    airportCard = airportCard,
-                    onStarClick = onStarClick,
-                    uiState = uiState,
-//                    modifier = modifier.padding(vertical = 4.dp)
+                    airportCardItem = airportCardItem,
+                    onAirportCardItemStarClick = onAirportCardItemStarClick,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
         }
@@ -56,11 +51,11 @@ fun FlightListPreview() {
     FlightSearch_Compose_Room_DataStoreTheme {
         FlightList(
             airportCardList = listOf(
-                AirportCard( 0,"SPb", "Sait-Petersburg", "MSK", "Moscow"),
-                AirportCard( 1,"NSB", "Novosibirsk", "VDK", "Vladivostok")
+                AirportCard(0, "SPb", "Sait-Petersburg", "MSK", "Moscow"),
+                AirportCard(1, "NSB", "Novosibirsk", "VDK", "Vladivostok")
             ),
-            onStarClick = {},
-            uiState = FlightUiState(),
+            onAirportCardItemStarClick = {},
+            tableName = "No Favorites",
         )
     }
 }

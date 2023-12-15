@@ -1,4 +1,4 @@
-package com.example.flightsearch_compose_room_datastore.ui.app_flight_screen
+package com.example.flightsearch_compose_room_datastore.ui.app_favorite_screen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,19 +12,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.flightsearch_compose_room_datastore.ui.FlightSearchTopAppBar
+import com.example.flightsearch_compose_room_datastore.ui.app_flight_screen.FlightList
 import com.example.flightsearch_compose_room_datastore.ui.app_search_screen.SearchTextField
 import com.example.flightsearch_compose_room_datastore.ui.theme.FlightSearch_Compose_Room_DataStoreTheme
 
-
-
 @Composable
-fun FlightResultScreen(
+fun FavoriteResultScreen(
     navigate : () -> Unit,
-    modifier: Modifier = Modifier,
-    flightViewModel: FlightViewModel = viewModel(factory = FlightViewModel.Factory)
-) {
+    modifier : Modifier = Modifier,
+    favoriteViewModel: FavoriteViewModel = viewModel(factory = FavoriteViewModel.Factory)
+){
 
-    val flightUIState by flightViewModel.uiState.collectAsState()
+    val favoriteUIState by favoriteViewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -34,23 +33,21 @@ fun FlightResultScreen(
             )
         }
     ) { innerPadding ->
-        Column(
+        Column (
             modifier = modifier.padding(horizontal = 16.dp)
-        ) {
+        ){
             SearchTextField(
-                searchFieldValue = flightUIState.searchField,
+                searchFieldValue = favoriteUIState.searchField,
                 onSearchFieldValueChange = {
-                    flightViewModel.saveSearchInPref(it)
+                    favoriteViewModel.saveSearchInPref(it)
                     navigate()
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(innerPadding)
+                modifier = Modifier.fillMaxWidth().padding(innerPadding)
             )
             FlightList(
-                tableName = flightUIState.tableName,
-                airportCardList = flightUIState.airportCards,
-                onAirportCardItemStarClick = { flightViewModel.saveOrDeleteInFavorites(it) },
+                tableName = favoriteUIState.tableName,
+                airportCardList = favoriteUIState.airportCards,
+                onAirportCardItemStarClick = { favoriteViewModel.onStarClick(it) },
                 modifier = Modifier
             )
         }
@@ -61,8 +58,8 @@ fun FlightResultScreen(
 @Composable
 fun FlightResultScreenPreview() {
     FlightSearch_Compose_Room_DataStoreTheme {
-        FlightResultScreen(
-            navigate ={}
+        FavoriteResultScreen(
+            navigate = {},
         )
     }
 }
