@@ -3,6 +3,7 @@ package com.example.flightsearch_compose_room_datastore.ui.app_search_screen
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -17,6 +18,7 @@ import com.example.flightsearch_compose_room_datastore.ui.theme.FlightSearch_Com
 
 @Composable
 fun SearchTextField(
+    onEraseItemClick : (String)-> Unit,
     searchFieldValue : String,
     onSearchFieldValueChange : (String)->Unit,
     modifier: Modifier = Modifier
@@ -34,15 +36,21 @@ fun SearchTextField(
             )
         },
         trailingIcon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_mic),
-                contentDescription = "Search"
-            )
+            IconButton(
+                onClick = { onEraseItemClick("") },
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_clear),
+                    contentDescription = "Search"
+                )
+            }
+
         },
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-        )
+        ),
+        singleLine = true
     )
 }
 
@@ -51,6 +59,7 @@ fun SearchTextField(
 fun SearchTextFieldPreview() {
     FlightSearch_Compose_Room_DataStoreTheme {
         SearchTextField(
+            onEraseItemClick = {},
             searchFieldValue = "Enter departure airport",
             onSearchFieldValueChange = {},
             modifier = Modifier.fillMaxWidth()

@@ -1,6 +1,5 @@
 package com.example.flightsearch_compose_room_datastore.ui.app_flight_screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -114,14 +113,6 @@ fun FlightCard(
                     contentDescription = "Select as favorite",
                     tint =  if (airportCardItem.isFavourite) Color(0xFFF1B512) else Color(0xFF656565)
                 )
-//                Icon(
-//                    painter = if (airportCardItem.isFavourite) {
-//                        painterResource(R.drawable.ic_star_selected)
-//                    } else {
-//                        painterResource(R.drawable.ic_star_notselected)
-//                    },
-//                    contentDescription = "Select as favorite",
-//                )
             }
         }
     }

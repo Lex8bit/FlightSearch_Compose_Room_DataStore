@@ -20,6 +20,7 @@ import com.example.flightsearch_compose_room_datastore.ui.theme.FlightSearch_Com
 @Composable
 fun FlightResultScreen(
     navigate : () -> Unit,
+    navigateToFavorite: () -> Unit,
     modifier: Modifier = Modifier,
     flightViewModel: FlightViewModel = viewModel(factory = FlightViewModel.Factory)
 ) {
@@ -38,10 +39,17 @@ fun FlightResultScreen(
             modifier = modifier.padding(horizontal = 16.dp)
         ) {
             SearchTextField(
+                onEraseItemClick = {
+                    flightViewModel.saveSearchInPref(it)
+                    navigateToFavorite()
+                },
                 searchFieldValue = flightUIState.searchField,
                 onSearchFieldValueChange = {
                     flightViewModel.saveSearchInPref(it)
-                    navigate()
+                    if (flightUIState.searchField == "")
+                        navigateToFavorite()
+                    else
+                        navigate()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -62,7 +70,8 @@ fun FlightResultScreen(
 fun FlightResultScreenPreview() {
     FlightSearch_Compose_Room_DataStoreTheme {
         FlightResultScreen(
-            navigate ={}
+            navigate ={},
+            navigateToFavorite = {}
         )
     }
 }

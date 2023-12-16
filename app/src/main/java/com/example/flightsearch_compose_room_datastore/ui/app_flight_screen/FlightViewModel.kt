@@ -31,11 +31,11 @@ class FlightViewModel(
     private val flightRepository: FlightRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
+
 //    private val _uiState = MutableStateFlow(FlightUiState())
 //    val uiState: StateFlow<FlightUiState> = _uiState.asStateFlow()
 
-    //Shared Pref
-//     один поток FavoriteUiState получился путем объединения airportCardsFLOW searchFieldFLOW
+    // Shared Pref один поток FavoriteUiState получился путем объединения airportCardsFLOW searchFieldFLOW
     val uiState: StateFlow<FlightUiState> = userPreferencesRepository.searchField
         .flatMapLatest { searchField ->
             combine(

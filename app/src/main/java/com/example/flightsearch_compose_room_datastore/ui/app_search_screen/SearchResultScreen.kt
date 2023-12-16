@@ -40,6 +40,10 @@ fun SearchResultScreen(
             modifier = modifier.padding(horizontal = 16.dp)
         ) {
             SearchTextField(
+                onEraseItemClick = {
+                    searchViewModel.saveSearchInPref(it)
+                    navigateToFavorite()
+                },
                 searchFieldValue = searchUIState.value.searchField,
                 onSearchFieldValueChange = {
                     searchViewModel.saveSearchInPref(it)
