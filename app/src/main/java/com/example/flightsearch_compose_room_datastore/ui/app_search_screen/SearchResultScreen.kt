@@ -7,8 +7,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,8 +32,9 @@ fun SearchResultScreen(
     searchViewModel: SearchViewModel = viewModel(factory = SearchViewModel.Factory)
 ) {
 
-    val searchUIState = searchViewModel.uiState.collectAsState()
-
+    val searchUIState by searchViewModel.uiState.collectAsState()
+    // для того чтобы гарантировать фокус при переходе на экран автоподсказок
+    val focusRequester = remember { FocusRequester() }
     Scaffold(
         topBar = {
             FlightSearchTopAppBar(
@@ -41,18 +48,23 @@ fun SearchResultScreen(
         ) {
             SearchTextField(
                 onEraseItemClick = {
-                    searchViewModel.saveSearchInPref(it)
+                    searchViewModel.saveSearchInPrefAfterErase()
                     navigateToFavorite()
                 },
-                searchFieldValue = searchUIState.value.searchField,
+                searchFieldValue = searchUIState.searchField,
                 onSearchFieldValueChange = {
-                    searchViewModel.saveSearchInPref(it)
-                    if(searchUIState.value.searchField == "")navigateToFavorite()
+                    if(it == ""){
+                        searchViewModel.saveSearchInPref(it)
+                        navigateToFavorite()
+                    }else{
+                        searchViewModel.saveSearchInPref(it)
+                    }
                 },
+                onSearchFieldClick = {},
                 modifier = Modifier
+                    .focusRequester(focusRequester) // для того чтобы гарантировать фокус при переходе на экран автоподсказок
                     .fillMaxWidth()
                     .padding(innerPadding)
-
             )
             Spacer(modifier = Modifier.height(16.dp))
             SearchList(
@@ -60,9 +72,13 @@ fun SearchResultScreen(
                     searchViewModel.saveSearchInPref(it.iataCode)
                     navigateToFlightList()
                 },
-                airportItemList = searchUIState.value.airportItemList,
+                airportItemList = searchUIState.airportItemList,
                 modifier = Modifier
             )
+            // для того чтобы гарантировать фокус при переходе на экран автоподсказок
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
         }
     }
 }

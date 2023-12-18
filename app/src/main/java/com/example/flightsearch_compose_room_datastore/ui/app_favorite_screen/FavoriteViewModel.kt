@@ -12,9 +12,12 @@ import com.example.flightsearch_compose_room_datastore.data.FlightRepository
 import com.example.flightsearch_compose_room_datastore.data.UserPreferencesRepository
 import com.example.flightsearch_compose_room_datastore.model.Favorite
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,40 +32,34 @@ class FavoriteViewModel(
     private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
 
-    //Shared Pref
+    @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<FavoriteUiState> =
-        // один поток FavoriteUiState получился путем объединения airportCardsFLOW searchFieldFLOW
-        combine(
-            flightRepository.getFavoriteFlightsFlow(),
-            userPreferencesRepository.searchField
-        )
-        { flightReposFavoriteFlights, userPrefsReposSearchField ->
-            FavoriteUiState(
-                searchField = userPrefsReposSearchField,
-                airportCards = flightReposFavoriteFlights.map {
-                    //Делаем запрос к БД для определения имен аэропортов
-                    val departureItem =
-                        withContext(Dispatchers.IO) { flightRepository.getAirportNameByCode(it.departureCode) }
-                    val destinationItem =
-                        withContext(Dispatchers.IO) { flightRepository.getAirportNameByCode(it.destinationCode) }
+        userPreferencesRepository.searchField
+            .flatMapLatest { searchField ->
+                flightRepository.getFavoriteFlightsFlow().map { listFavorite ->
+                    FavoriteUiState(
+                        searchField = searchField,
+                        airportCards = listFavorite.map {
+                            //Делаем запрос к БД для определения имен аэропортов
+                            val departureItem = withContext(Dispatchers.IO) {
+                                async{flightRepository.getAirportItemByCode(it.departureCode)}
+                            }
+                            val destinationItem = withContext(Dispatchers.IO) {
+                                async{flightRepository.getAirportItemByCode(it.destinationCode)}
+                            }
+                            it.toAirportCard(departureItem.await()!!.name, destinationItem.await()!!.name)
+                        },
+                        tableName = if (listFavorite.isEmpty()) "No Favorite Routes" else "Favorite routes"
+                    )
+                }
 
-                    it.toAirportCard(departureItem.name, destinationItem.name)
-                },
-                tableName = if (flightReposFavoriteFlights.isEmpty()) "No Favorite Routes" else "Favorite routes"
-            )
-        }
+            }
             //для преобразования Flow в StateFlow.
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = FavoriteUiState()
             )
-
-    fun saveSearchInPref(searchQuery: String) {
-        viewModelScope.launch {
-            userPreferencesRepository.saveSearchField(searchQuery)
-        }
-    }
 
     fun onStarClick(item:AirportCard) {
         viewModelScope.launch {

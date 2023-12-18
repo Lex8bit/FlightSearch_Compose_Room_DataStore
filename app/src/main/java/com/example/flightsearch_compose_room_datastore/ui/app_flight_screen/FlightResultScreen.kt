@@ -40,17 +40,12 @@ fun FlightResultScreen(
         ) {
             SearchTextField(
                 onEraseItemClick = {
-                    flightViewModel.saveSearchInPref(it)
+                    flightViewModel.saveSearchInPrefAfterErase()
                     navigateToFavorite()
                 },
                 searchFieldValue = flightUIState.searchField,
-                onSearchFieldValueChange = {
-                    flightViewModel.saveSearchInPref(it)
-                    if (flightUIState.searchField == "")
-                        navigateToFavorite()
-                    else
-                        navigate()
-                },
+                onSearchFieldValueChange = {},
+                onSearchFieldClick = { navigate() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(innerPadding)

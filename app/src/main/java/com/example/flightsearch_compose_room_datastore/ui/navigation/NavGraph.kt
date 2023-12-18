@@ -33,15 +33,15 @@ fun FlightSearchNavHost(
         startDestination = FlightSearchScreen.FavoriteScreen.name,
         modifier = modifier
     ) {
-        composable(route = FlightSearchScreen.FavoriteScreen.name) {
-            FavoriteResultScreen(
-                navigate = { navController.navigate(FlightSearchScreen.SearchScreen.name) },
-            )
-        }
         composable(route = FlightSearchScreen.SearchScreen.name) {
             SearchResultScreen(
                 navigateToFlightList = { navController.navigate(FlightSearchScreen.FlightScreen.name) },
                 navigateToFavorite = { navController.navigate(FlightSearchScreen.FavoriteScreen.name) }
+            )
+        }
+        composable(route = FlightSearchScreen.FavoriteScreen.name) {
+            FavoriteResultScreen(
+                navigate = { navController.navigate(FlightSearchScreen.SearchScreen.name) },
             )
         }
         composable(route = FlightSearchScreen.FlightScreen.name) {

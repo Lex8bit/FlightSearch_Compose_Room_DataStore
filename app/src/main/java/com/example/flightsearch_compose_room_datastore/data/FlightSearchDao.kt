@@ -41,5 +41,5 @@ interface FlightSearchDao {
 //    @Query("SELECT name FROM airport WHERE iata_code = :code")
 //    fun getAirportNameByCode(code: String): String
     @Query("SELECT * FROM airport WHERE iata_code = :code")
-    fun getAirportNameByCode(code: String): Airport
+    suspend fun getAirportItemByCode(code: String): Airport?
 }

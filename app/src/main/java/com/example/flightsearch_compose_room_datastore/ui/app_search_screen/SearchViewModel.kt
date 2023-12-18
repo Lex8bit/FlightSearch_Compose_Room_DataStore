@@ -9,17 +9,14 @@ import com.example.flightsearch_compose_room_datastore.FlightSearchApplication
 import com.example.flightsearch_compose_room_datastore.data.FlightRepository
 import com.example.flightsearch_compose_room_datastore.data.UserPreferencesRepository
 import com.example.flightsearch_compose_room_datastore.model.Airport
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 
 data class SearchUiState(
@@ -33,6 +30,7 @@ class SearchViewModel(
 ): ViewModel() {
 
     //преобразует поток в другой поток, который содержит только самые последние значения из исходного потока.
+    @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<SearchUiState> = userPreferencesRepository.searchField
         .flatMapLatest { searchField ->
             flightRepository.getFlightsForSearchFieldFlow(searchField)
@@ -51,6 +49,11 @@ class SearchViewModel(
     fun saveSearchInPref(searchQuery: String) {
         viewModelScope.launch {
             userPreferencesRepository.saveSearchField(searchQuery)
+        }
+    }
+    fun saveSearchInPrefAfterErase() {
+        viewModelScope.launch {
+            userPreferencesRepository.saveSearchField("")
         }
     }
 

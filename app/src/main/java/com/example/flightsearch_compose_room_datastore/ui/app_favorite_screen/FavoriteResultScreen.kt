@@ -37,14 +37,10 @@ fun FavoriteResultScreen(
             modifier = modifier.padding(horizontal = 16.dp)
         ){
             SearchTextField(
-                onEraseItemClick = {
-                    favoriteViewModel.saveSearchInPref(it)
-                },
+                onEraseItemClick = {},
                 searchFieldValue = favoriteUIState.searchField,
-                onSearchFieldValueChange = {
-                    favoriteViewModel.saveSearchInPref(it)
-                    navigate()
-                },
+                onSearchFieldValueChange = {},
+                onSearchFieldClick = { navigate() },
                 modifier = Modifier.fillMaxWidth().padding(innerPadding)
             )
             FlightList(
@@ -63,6 +59,6 @@ fun FlightResultScreenPreview() {
     FlightSearch_Compose_Room_DataStoreTheme {
         FavoriteResultScreen(
             navigate = {},
-        )
+            )
     }
 }

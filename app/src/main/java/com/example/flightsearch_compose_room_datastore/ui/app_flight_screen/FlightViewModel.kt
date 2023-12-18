@@ -10,9 +10,10 @@ import com.example.flightsearch_compose_room_datastore.data.AirportCard
 import com.example.flightsearch_compose_room_datastore.data.FlightRepository
 import com.example.flightsearch_compose_room_datastore.data.UserPreferencesRepository
 import com.example.flightsearch_compose_room_datastore.model.Airport
-import com.example.flightsearch_compose_room_datastore.model.Favorite
 import com.example.flightsearch_compose_room_datastore.ui.app_favorite_screen.toFavorite
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -35,9 +36,13 @@ class FlightViewModel(
 //    private val _uiState = MutableStateFlow(FlightUiState())
 //    val uiState: StateFlow<FlightUiState> = _uiState.asStateFlow()
 
-    // Shared Pref один поток FavoriteUiState получился путем объединения airportCardsFLOW searchFieldFLOW
-    val uiState: StateFlow<FlightUiState> = userPreferencesRepository.searchField
+//     Shared Pref один поток FavoriteUiState получился путем объединения airportCardsFLOW searchFieldFLOW
+@OptIn(ExperimentalCoroutinesApi::class)
+val uiState: StateFlow<FlightUiState> = userPreferencesRepository.searchField
         .flatMapLatest { searchField ->
+            var departureItem = withContext(Dispatchers.IO) {
+                async { flightRepository.getAirportItemByCode(searchField)?: Airport() }
+            }
             combine(
                 flightRepository.getAllFlightsFromChosenAirportFlow(searchField),
                 flightRepository.getFavoriteFlightsFlow()
@@ -45,16 +50,11 @@ class FlightViewModel(
                 FlightUiState(
                     searchField = searchField,
                     airportCards = allFlightsFromChosenAirport.map {airport ->
-                        val departureItem =
-                            withContext(Dispatchers.IO) {flightRepository.getAirportNameByCode(searchField)}
-                        val isFavorite = favoriteFlights.contains(
-                                Favorite(
-                                    airport.id,
-                                    departureItem.iataCode,
-                                    airport.iataCode
-                                )
-                            )
-                        airport.toAirportCard(departureItem.iataCode, departureItem.name,isFavorite)
+                        val isFavorite =
+                            favoriteFlights.any { favorite ->
+                                favorite.departureCode == departureItem.await().iataCode && favorite.destinationCode == airport.iataCode
+                            }
+                        airport.toAirportCard(departureItem.await().iataCode, departureItem.await().name,isFavorite)
                     },
                     tableName = "Search from $searchField"
                 )
@@ -66,10 +66,9 @@ class FlightViewModel(
             initialValue = FlightUiState()
         )
 
-
-    fun saveSearchInPref(searchQuery: String) {
+    fun saveSearchInPrefAfterErase() {
         viewModelScope.launch {
-            userPreferencesRepository.saveSearchField(searchQuery)
+            userPreferencesRepository.saveSearchField("")
         }
     }
 

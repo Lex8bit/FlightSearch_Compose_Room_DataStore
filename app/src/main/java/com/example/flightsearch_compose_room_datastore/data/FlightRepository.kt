@@ -27,7 +27,7 @@ interface FlightRepository {
     /**
      * Получить имена аэропортов по коду / для Favorite
      */
-    fun getAirportNameByCode(code: String): Airport
+    suspend fun getAirportItemByCode(code: String): Airport?
 
     /**
      *Сохранить в таблицу Favorites
