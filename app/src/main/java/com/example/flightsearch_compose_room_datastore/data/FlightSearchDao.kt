@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface FlightSearchDao {
 
     @Query("SELECT * FROM airport WHERE iata_code LIKE '%' || :searchField || '%' OR name LIKE '%' || :searchField || '%' ORDER BY passengers DESC")
-    fun getFlightsForSearchFieldFlow(searchField: String): Flow<List<Airport>>
+    fun getFlightsForSearchFieldFlow(searchField: String): List<Airport>//Flow<List<Airport>>
 
     @Query("SELECT * FROM airport WHERE iata_code != :completeSearchField ORDER BY passengers DESC")
     fun getAllFlightsFromChosenAirportFlow(completeSearchField: String): Flow<List<Airport>>
@@ -27,13 +27,17 @@ interface FlightSearchDao {
     /**
      * Удаление записей из Таблицы Favorite
      */
-    @Delete(entity = Favorite::class)
-    suspend fun deleteFromFavorites(item:Favorite)
+//    @Delete(entity = Favorite::class)
+//    suspend fun deleteFromFavorites(item:Favorite)
+    @Query("DELETE FROM favorite WHERE departure_code=:departureCode AND destination_code=:destinationCode")
+    suspend fun deleteFromFavorites(departureCode: String, destinationCode: String)
     /**
      *Сохранить в таблицу Favorites
      */
-    @Insert(entity = Favorite::class,onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertInFavorite(item: Favorite)
+//    @Insert(entity = Favorite::class,onConflict = OnConflictStrategy.IGNORE)
+//    suspend fun insertInFavorite(item: Favorite)
+    @Query("INSERT INTO favorite VALUES (NULL,:departureCode,:destinationCode)")
+    suspend fun insertInFavorite(departureCode: String, destinationCode: String)
 
     /**
      * Получить имена аэропортов по коду / для Favorite

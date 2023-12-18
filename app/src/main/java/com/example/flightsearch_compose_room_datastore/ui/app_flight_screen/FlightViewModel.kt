@@ -10,7 +10,6 @@ import com.example.flightsearch_compose_room_datastore.data.AirportCard
 import com.example.flightsearch_compose_room_datastore.data.FlightRepository
 import com.example.flightsearch_compose_room_datastore.data.UserPreferencesRepository
 import com.example.flightsearch_compose_room_datastore.model.Airport
-import com.example.flightsearch_compose_room_datastore.ui.app_favorite_screen.toFavorite
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -32,9 +31,6 @@ class FlightViewModel(
     private val flightRepository: FlightRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
-
-//    private val _uiState = MutableStateFlow(FlightUiState())
-//    val uiState: StateFlow<FlightUiState> = _uiState.asStateFlow()
 
 //     Shared Pref один поток FavoriteUiState получился путем объединения airportCardsFLOW searchFieldFLOW
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -67,7 +63,7 @@ val uiState: StateFlow<FlightUiState> = userPreferencesRepository.searchField
         )
 
     fun saveSearchInPrefAfterErase() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO){
             userPreferencesRepository.saveSearchField("")
         }
     }
@@ -75,13 +71,12 @@ val uiState: StateFlow<FlightUiState> = userPreferencesRepository.searchField
     fun saveOrDeleteInFavorites(item: AirportCard) {
         viewModelScope.launch {
             if (item.isFavourite){
-                flightRepository.deleteFromFavorites(item.toFavorite())
+                flightRepository.deleteFromFavorites(item.iataDepartureCode,item.iataDestinationCode)
             }else{
-                flightRepository.insertInFavorite(item.toFavorite())
+                flightRepository.insertInFavorite(item.iataDepartureCode,item.iataDestinationCode)
             }
         }
     }
-
     companion object {
         val Factory : ViewModelProvider.Factory = viewModelFactory {
             initializer {
@@ -97,7 +92,7 @@ val uiState: StateFlow<FlightUiState> = userPreferencesRepository.searchField
 
 fun Airport.toAirportCard(departureCode:String,departureName:String,isFavorite:Boolean): AirportCard {
     return AirportCard(
-        id = id,
+//        id = id,
         isFavourite = isFavorite,
         departureName = departureName,
         destinationName = name,

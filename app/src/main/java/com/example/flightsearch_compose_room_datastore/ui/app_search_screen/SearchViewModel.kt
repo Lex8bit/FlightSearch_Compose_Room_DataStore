@@ -9,14 +9,11 @@ import com.example.flightsearch_compose_room_datastore.FlightSearchApplication
 import com.example.flightsearch_compose_room_datastore.data.FlightRepository
 import com.example.flightsearch_compose_room_datastore.data.UserPreferencesRepository
 import com.example.flightsearch_compose_room_datastore.model.Airport
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class SearchUiState(
@@ -29,31 +26,60 @@ class SearchViewModel(
     private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
 
-    //преобразует поток в другой поток, который содержит только самые последние значения из исходного потока.
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val uiState: StateFlow<SearchUiState> = userPreferencesRepository.searchField
-        .flatMapLatest { searchField ->
-            flightRepository.getFlightsForSearchFieldFlow(searchField)
-                .map { listAirport ->
-                    SearchUiState(
-                        searchField = searchField,
-                        airportItemList = listAirport
-                    )
-                }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = SearchUiState()
-        )
-    fun saveSearchInPref(searchQuery: String) {
-        viewModelScope.launch {
-            userPreferencesRepository.saveSearchField(searchQuery)
+    private val _uiState = MutableStateFlow(SearchUiState())
+    var uiState :StateFlow<SearchUiState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch(Dispatchers.IO){
+            userPreferencesRepository.searchField.collect{
+                updateState(it)
+            }
         }
     }
-    fun saveSearchInPrefAfterErase() {
-        viewModelScope.launch {
-            userPreferencesRepository.saveSearchField("")
+
+    private fun updateState(query: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val list = flightRepository.getFlightsForSearchFieldFlow(query)
+            _uiState.update {
+                it.copy(
+                    searchField = query,
+                    airportItemList = list
+                )
+            }
+        }
+    }
+    fun updateSearchField(searchQuery: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val list = flightRepository.getFlightsForSearchFieldFlow(searchQuery)
+            _uiState.update {
+                it.copy(
+                    searchField = searchQuery,
+                    airportItemList = list
+                )
+            }
+        }
+        saveSearchInPref(searchQuery)
+    }
+
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    val uiState: StateFlow<SearchUiState> = userPreferencesRepository.searchField
+//        .flatMapLatest { searchField ->
+//            flightRepository.getFlightsForSearchFieldFlow(searchField)
+//                .map { listAirport ->
+//                    SearchUiState(
+//                        searchField = searchField,
+//                        airportItemList = listAirport
+//                    )
+//                }
+//        }
+//        .stateIn(
+//            scope = viewModelScope,
+//            started = SharingStarted.WhileSubscribed(5_000),
+//            initialValue = SearchUiState()
+//        )
+    private fun saveSearchInPref(searchQuery: String) {
+        viewModelScope.launch(Dispatchers.IO){
+            userPreferencesRepository.saveSearchField(searchQuery)
         }
     }
 

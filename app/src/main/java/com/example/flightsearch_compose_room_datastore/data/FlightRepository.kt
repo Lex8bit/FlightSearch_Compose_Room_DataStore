@@ -1,16 +1,12 @@
 package com.example.flightsearch_compose_room_datastore.data
 
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
 import com.example.flightsearch_compose_room_datastore.model.Airport
 import com.example.flightsearch_compose_room_datastore.model.Favorite
 import kotlinx.coroutines.flow.Flow
 
 interface FlightRepository {
 
-    fun getFlightsForSearchFieldFlow( searchField: String): Flow<List<Airport>>
+    fun getFlightsForSearchFieldFlow( searchField: String): List<Airport>//Flow<List<Airport>>
 
     fun getAllFlightsFromChosenAirportFlow(completeSearchField: String): Flow<List<Airport>>
 
@@ -22,7 +18,7 @@ interface FlightRepository {
     /**
      * Удаление записей из Таблицы Favorite
      */
-    suspend fun deleteFromFavorites(item:Favorite)
+    suspend fun deleteFromFavorites(departureCode: String, destinationCode: String)//(item:Favorite)
 
     /**
      * Получить имена аэропортов по коду / для Favorite
@@ -32,5 +28,5 @@ interface FlightRepository {
     /**
      *Сохранить в таблицу Favorites
      */
-    suspend fun insertInFavorite(item: Favorite)
+    suspend fun insertInFavorite(departureCode: String, destinationCode: String)//(item: Favorite)
 }

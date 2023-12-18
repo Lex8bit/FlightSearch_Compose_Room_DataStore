@@ -12,11 +12,9 @@ import com.example.flightsearch_compose_room_datastore.data.FlightRepository
 import com.example.flightsearch_compose_room_datastore.data.UserPreferencesRepository
 import com.example.flightsearch_compose_room_datastore.model.Favorite
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -32,28 +30,22 @@ class FavoriteViewModel(
     private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<FavoriteUiState> =
-        userPreferencesRepository.searchField
-            .flatMapLatest { searchField ->
-                flightRepository.getFavoriteFlightsFlow().map { listFavorite ->
-                    FavoriteUiState(
-                        searchField = searchField,
-                        airportCards = listFavorite.map {
-                            //Делаем запрос к БД для определения имен аэропортов
-                            val departureItem = withContext(Dispatchers.IO) {
-                                async{flightRepository.getAirportItemByCode(it.departureCode)}
-                            }
-                            val destinationItem = withContext(Dispatchers.IO) {
-                                async{flightRepository.getAirportItemByCode(it.destinationCode)}
-                            }
-                            it.toAirportCard(departureItem.await()!!.name, destinationItem.await()!!.name)
-                        },
-                        tableName = if (listFavorite.isEmpty()) "No Favorite Routes" else "Favorite routes"
-                    )
-                }
-
-            }
+        flightRepository.getFavoriteFlightsFlow().map { listFavorite ->
+            FavoriteUiState(
+                airportCards = listFavorite.map {
+                    //Делаем запрос к БД для определения имен аэропортов
+                    val departureItem = withContext(Dispatchers.IO) {
+                        async { flightRepository.getAirportItemByCode(it.departureCode) }
+                    }
+                    val destinationItem = withContext(Dispatchers.IO) {
+                        async { flightRepository.getAirportItemByCode(it.destinationCode) }
+                    }
+                    it.toAirportCard(departureItem.await()!!.name, destinationItem.await()!!.name)
+                },
+                tableName = if (listFavorite.isEmpty()) "No Favorite Routes" else "Favorite routes"
+            )
+        }
             //для преобразования Flow в StateFlow.
             .stateIn(
                 scope = viewModelScope,
@@ -61,12 +53,34 @@ class FavoriteViewModel(
                 initialValue = FavoriteUiState()
             )
 
+
+    //    val uiState: StateFlow<FavoriteUiState> =
+//        flightRepository.getFavoriteFlightsFlow().map { listFavorite ->
+//            FavoriteUiState(
+//                airportCards = listFavorite.map {
+//                    var departureItem = Airport()
+//                    var destinationItem = Airport()
+//                    viewModelScope.launch(Dispatchers.IO) {
+//                        departureItem = flightRepository.getAirportItemByCode(it.departureCode)?:Airport()
+//                        destinationItem = flightRepository.getAirportItemByCode(it.destinationCode)?:Airport()
+//                    }
+//                    it.toAirportCard(departureItem.name, destinationItem.name)
+//                },
+//                tableName = if (listFavorite.isEmpty()) "No Favorite Routes" else "Favorite routes"
+//            )
+//        }
+//            //для преобразования Flow в StateFlow.
+//            .stateIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(5_000),
+//                initialValue = FavoriteUiState()
+//            )
+
     fun onStarClick(item:AirportCard) {
         viewModelScope.launch {
-            flightRepository.deleteFromFavorites(item.toFavorite())
+            flightRepository.deleteFromFavorites(item.iataDepartureCode,item.iataDestinationCode)
         }
     }
-
     companion object {
         val Factory : ViewModelProvider.Factory = viewModelFactory {
             initializer {
@@ -80,11 +94,10 @@ class FavoriteViewModel(
     }
 }
 
-
 fun Favorite.toAirportCard(departureName:String, destinationName:String): AirportCard {
     Log.d("my","toAirportCard is working")
     return AirportCard(
-        id = id,
+//        id = id,
         isFavourite = true,
         departureName = departureName,
         destinationName = destinationName,
@@ -92,10 +105,3 @@ fun Favorite.toAirportCard(departureName:String, destinationName:String): Airpor
         iataDestinationCode = destinationCode,
     )
 }
-
-fun AirportCard.toFavorite(): Favorite =
-    Favorite(
-        id = id,
-        departureCode = iataDepartureCode,
-        destinationCode = iataDestinationCode
-    )

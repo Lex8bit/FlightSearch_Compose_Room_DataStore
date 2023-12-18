@@ -3,7 +3,6 @@ package com.example.flightsearch_compose_room_datastore.data
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -38,7 +37,7 @@ class UserPreferencesRepository(
     //Изменяем значение по нашему ключу
     suspend fun saveSearchField(searchField: String) {
         dataStore.edit { preferences ->
-            preferences[SEARCH_FIELD] = searchField
+           preferences[SEARCH_FIELD] = searchField
         }
     }
 }
