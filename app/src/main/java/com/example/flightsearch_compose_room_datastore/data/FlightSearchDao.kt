@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface FlightSearchDao {
 
     @Query("SELECT * FROM airport WHERE iata_code LIKE '%' || :searchField || '%' OR name LIKE '%' || :searchField || '%' ORDER BY passengers DESC")
-    fun getFlightsForSearchFieldFlow(searchField: String): List<Airport>//Flow<List<Airport>>
+    fun getFlightsForSearchFieldFlow(searchField: String): Flow<List<Airport>> //List<Airport>
 
     @Query("SELECT * FROM airport WHERE iata_code != :completeSearchField ORDER BY passengers DESC")
     fun getAllFlightsFromChosenAirportFlow(completeSearchField: String): Flow<List<Airport>>

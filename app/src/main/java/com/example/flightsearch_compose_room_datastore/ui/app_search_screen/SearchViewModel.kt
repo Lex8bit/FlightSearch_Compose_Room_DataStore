@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -37,9 +38,8 @@ class SearchViewModel(
         }
     }
 
-    private fun updateState(query: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val list = flightRepository.getFlightsForSearchFieldFlow(query)
+    private suspend fun updateState(query: String) {
+        flightRepository.getFlightsForSearchFieldFlow(query).collect { list ->
             _uiState.update {
                 it.copy(
                     searchField = query,
@@ -50,12 +50,13 @@ class SearchViewModel(
     }
     fun updateSearchField(searchQuery: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val list = flightRepository.getFlightsForSearchFieldFlow(searchQuery)
-            _uiState.update {
-                it.copy(
-                    searchField = searchQuery,
-                    airportItemList = list
-                )
+            flightRepository.getFlightsForSearchFieldFlow(searchQuery).collect{ list ->
+                _uiState.update {
+                    it.copy(
+                        searchField = searchQuery,
+                        airportItemList = list
+                    )
+                }
             }
         }
         saveSearchInPref(searchQuery)
