@@ -26,6 +26,8 @@ import com.example.flightsearch_compose_room_datastore.ui.theme.FlightSearch_Com
 @Composable
 fun SearchTextField(
     onEraseItemClick : () -> Unit,
+    isFilled: Boolean = true,
+    isNeedAnIcon : Boolean = true,
     searchFieldValue : String,
     onSearchFieldClick: () -> Unit,
     onSearchFieldValueChange : (String)->Unit,
@@ -43,15 +45,23 @@ fun SearchTextField(
                 contentDescription = "Search"
             )
         },
-        trailingIcon = {
+        trailingIcon = {if (isNeedAnIcon){
             IconButton(
                 onClick = onEraseItemClick,
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_clear),
-                    contentDescription = "Search"
-                )
+                if(isFilled){
+                    Icon(
+                        painter = painterResource(R.drawable.ic_clear),
+                        contentDescription = "Clear"
+                    )
+                }else{
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_back),
+                        contentDescription = "Back to Favorite"
+                    )
+                }
             }
+        }
         },
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,
@@ -81,6 +91,7 @@ fun SearchTextFieldPreview() {
             searchFieldValue = "Enter departure airport",
             onSearchFieldValueChange = {},
             onSearchFieldClick = {},
+            isFilled = true,
             modifier = Modifier.fillMaxWidth()
         )
     }

@@ -41,7 +41,10 @@ fun FavoriteResultScreen(
                 searchFieldValue = favoriteUIState.searchField,
                 onSearchFieldValueChange = {},
                 onSearchFieldClick = { navigate() },
-                modifier = Modifier.fillMaxWidth().padding(innerPadding)
+                isNeedAnIcon = false,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(innerPadding)
             )
             FlightList(
                 tableName = favoriteUIState.tableName,

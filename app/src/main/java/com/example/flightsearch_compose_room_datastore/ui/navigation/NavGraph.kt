@@ -30,7 +30,7 @@ fun FlightSearchNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = FlightSearchScreen.FavoriteScreen.name,
+        startDestination = FlightSearchScreen.SearchScreen.name,
         modifier = modifier
     ) {
         composable(route = FlightSearchScreen.SearchScreen.name) {

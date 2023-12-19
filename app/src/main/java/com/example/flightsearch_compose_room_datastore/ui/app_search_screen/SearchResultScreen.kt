@@ -63,6 +63,7 @@ fun SearchResultScreen(
                         searchViewModel.updateSearchField(it)
                     }
                 },
+                isFilled = searchUIState.searchField!="",
                 onSearchFieldClick = {},
                 modifier = Modifier
                     .focusRequester(focusRequester) // для того чтобы гарантировать фокус при переходе на экран автоподсказок

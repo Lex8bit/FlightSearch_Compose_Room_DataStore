@@ -76,6 +76,12 @@ class FavoriteViewModel(
 //                initialValue = FavoriteUiState()
 //            )
 
+//    fun saveSearchInPref(searchQuery: String) {
+//        viewModelScope.launch(Dispatchers.IO){
+//            userPreferencesRepository.saveSearchField(searchQuery)
+//        }
+//    }
+
     fun onStarClick(item:AirportCard) {
         viewModelScope.launch {
             flightRepository.deleteFromFavorites(item.iataDepartureCode,item.iataDestinationCode)
